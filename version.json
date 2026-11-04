@@ -1,15 +1,15 @@
 {
   "version": "1.1.2",
-  "buildNumber": 1,
-  "releaseDate": "2026-11-04",
-  "title": "LaboPro LIS - Version 1.1.2",
+  "buildNumber": 2,
+  "releaseDate": "2026-11-15",
+  "title": "Mise à jour v1.1.2 - Nouvelles fonctionnalités",
   "changelog": [
-    "change the application icon"
-    
+    "Sauvegarde automatique de la base de données sur support externe",
+    "Prise en charge des impressions de reçus sur imprimante thermique 58mm",
+    "Optimisation de la vitesse de saisie sur la paillasse",
+    "Correction du calcul des remises sur les analyses sous-traitées"
   ],
-  "downloadUrl": "https://github.com/packfear/laboratoire/releases/download/labo/laboratoire.exe",
+  "downloadUrl": "https://votre-domaine.com/downloads/LaboPro_Setup_1.1.0.exe",
   "isMandatory": false,
-  "minSupportedVersion": "1.0.0",
-  "fileSizeMb": 1
+  "minSupportedVersion": "1.0.0"
 }
-
