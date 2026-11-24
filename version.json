@@ -1,14 +1,11 @@
 {
-  "version": "1.1.5",
+  "version": "1.1.6",
   "buildNumber": 1,
-  "releaseDate": "2026-11-24",
-  "title": "LaboPro LIS - Version 1.1.5",
+  "releaseDate": "2026-11-25",
+  "title": "LaboPro LIS - Version 1.1.6",
   "changelog": [
-    "Système complet de groupage sanguin ABO + Rhésus et impression des cartes",
-    "Résolution et optimisation de la connexion automate Mindray BC-30s (Mode Client TCP)",
-    "Actualisation instantanée des analyses modifiées sur la paillasse",
-    "Suppression des alertes médicales indues sur le phénotype de groupage"
-  ],
+    "Résolution et optimisation de la connexion automate Mindray BC-30s "
+    ],
   "downloadUrl": "https://github.com/packfear/laboratoire/releases/download/labo/laboratoire.exe",
   "isMandatory": false,
   "minSupportedVersion": "1.0.0",
