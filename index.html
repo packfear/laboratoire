@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Résultats d'Analyses en Ligne - LaboPro LIS</title>
+  <style>
+    :root {
+      --primary: #0d6efd;
+      --primary-dark: #0a58ca;
+      --success: #198754;
+      --warning: #fd7e14;
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body {
+      margin: 0;
+      padding: 20px 14px;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      width: 100%;
+      max-width: 520px;
+    }
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+      padding: 24px;
+      border: 1px solid var(--border);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 14px;
+      background: #e7f1ff;
+      color: var(--primary);
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+    h1 {
+      margin: 0;
+      font-size: 20px;
+      color: var(--text);
+    }
+    .subtitle {
+      margin: 6px 0 0;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    input {
+      width: 100%;
+      padding: 11px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+    }
+    input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.15); }
+    button {
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: var(--primary-dark); }
+    button.secondary {
+      background: #0f766e;
+      margin-top: 10px;
+    }
+    button.secondary:hover { background: #0d5e58; }
+    .alert {
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      line-height: 1.45;
+      margin-top: 14px;
+    }
+    .alert-info { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+    .alert-warn { background: #fff7ed; color: #9a3412; border: 1px solid #fed7aa; }
+    .alert-err { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+    .result-box {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 10px;
+      background: #f8fafc;
+      border: 1px solid var(--border);
+    }
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 5px 0;
+      border-bottom: 1px dashed #e2e8f0;
+    }
+    .meta-row:last-child { border-bottom: none; }
+    .hidden { display: none; }
+    .spinner {
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="header">
+        <div class="logo-badge">🔬</div>
+        <h1 id="labTitle">Portail Résultats en Ligne</h1>
+        <p class="subtitle">Consultation sécurisée de vos analyses médicales</p>
+      </div>
+
+      <!-- FORMULAIRE MANUEL (N° DOSSIER + PIN) -->
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="orderNumber">Numéro de dossier</label>
+          <input type="text" id="orderNumber" placeholder="Ex: ORD-20261124-001" required />
+        </div>
+        <div class="form-group">
+          <label for="pinCode">Code PIN (affiché sur votre reçu)</label>
+          <input type="text" id="pinCode" inputmode="numeric" maxlength="6" placeholder="Ex: 482910" required />
+        </div>
+        <button type="submit">Consulter mes résultats</button>
+      </form>
+
+      <div id="loadingBox" class="spinner hidden">
+        Recherche de votre dossier en cours...
+      </div>
+
+      <div id="statusMessage" class="hidden"></div>
+
+      <!-- AFFICHAGE DU RÉSULTAT -->
+      <div id="resultBox" class="result-box hidden">
+        <div class="meta-row"><span>Patient :</span><strong id="resPatient"></strong></div>
+        <div class="meta-row"><span>N° Dossier :</span><strong id="resOrder"></strong></div>
+        <div class="meta-row"><span>Validé le :</span><strong id="resDate"></strong></div>
+        <div class="meta-row"><span>Laboratoire :</span><strong id="resLab"></strong></div>
+
+        <div id="partialBanner" class="alert alert-warn hidden">
+          Certaines analyses spécialisées (sous-traitance) sont encore en cours de réception. Les résultats internes validés sont déjà disponibles ci-dessous.
+        </div>
+
+        <div style="margin-top: 16px;">
+          <button id="downloadMainPdf" type="button">📄 Télécharger le Compte-Rendu (PDF)</button>
+          <button id="downloadExternalPdf" type="button" class="secondary hidden">📎 Télécharger le Rapport Externe (PDF)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // CONFIGURATION SUPABASE : Remplacez ces deux valeurs par les vôtres
+    // (Vous les retrouvez dans Supabase > Settings > API)
+    // =========================================================================
+    const SUPABASE_URL = "https://xhzillchvzohfzidegrt.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_secret_DXgS1jrRrjt_DNuZPn2-QA_2a5uSjGg";
+
+    const params = new URLSearchParams(window.location.search);
+    const qrToken = params.get("t");
+
+    const loginForm = document.getElementById("loginForm");
+    const loadingBox = document.getElementById("loadingBox");
+    const statusMessage = document.getElementById("statusMessage");
+    const resultBox = document.getElementById("resultBox");
+
+    function showMessage(text, type = "info") {
+      statusMessage.className = "alert alert-" + type;
+      statusMessage.textContent = text;
+      statusMessage.classList.remove("hidden");
+    }
+
+    function base64ToBlobUrl(base64) {
+      const byteChars = atob(base64);
+      const byteNumbers = new Array(byteChars.length);
+      for (let i = 0; i < byteChars.length; i++) {
+        byteNumbers[i] = byteChars.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: "application/pdf" });
+      return URL.createObjectURL(blob);
+    }
+
+    async function fetchResult({ token = null, orderNumber = null, pinCode = null }) {
+      statusMessage.classList.add("hidden");
+      resultBox.classList.add("hidden");
+      loadingBox.classList.remove("hidden");
+
+      try {
+        const headers = {
+          "apikey": SUPABASE_ANON_KEY,
+          "Content-Type": "application/json"
+        };
+        if (SUPABASE_ANON_KEY.startsWith("eyJ")) {
+          headers["Authorization"] = `Bearer ${SUPABASE_ANON_KEY}`;
+        }
+
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/rpc/get_patient_result`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            p_token: token,
+            p_order_number: orderNumber,
+            p_pin_code: pinCode
+          })
+        });
+
+        loadingBox.classList.add("hidden");
+        if (!res.ok) {
+          showMessage("Impossible de joindre le serveur du laboratoire. Réessayez plus tard.", "err");
+          return;
+        }
+
+        const data = await res.json();
+        if (!data || data.length === 0) {
+          if (token) {
+            showMessage("Vos analyses sont en cours de traitement par le laboratoire (ou en attente de règlement final au secrétariat). Merci de réessayer ultérieurement.", "info");
+          } else {
+            showMessage("Aucun résultat publié trouvé pour ce numéro de dossier et code PIN (vérifiez vos informations ou patientez jusqu'à la validation finale).", "warn");
+          }
+          return;
+        }
+
+        const record = data[0];
+        document.getElementById("labTitle").textContent = record.lab_name || "Portail Résultats";
+        document.getElementById("resPatient").textContent = record.patient_name;
+        document.getElementById("resOrder").textContent = record.order_number;
+        document.getElementById("resDate").textContent = new Date(record.validated_at).toLocaleString("fr-FR");
+        document.getElementById("resLab").textContent = record.lab_name + (record.lab_phone ? ` (${record.lab_phone})` : "");
+
+        const partialBanner = document.getElementById("partialBanner");
+        if (record.has_pending_external) {
+          partialBanner.classList.remove("hidden");
+        } else {
+          partialBanner.classList.add("hidden");
+        }
+
+        const mainBtn = document.getElementById("downloadMainPdf");
+        mainBtn.onclick = () => {
+          const url = base64ToBlobUrl(record.pdf_base64);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `Resultats_${record.order_number}.pdf`;
+          a.click();
+        };
+
+        const extBtn = document.getElementById("downloadExternalPdf");
+        if (record.external_pdf_base64) {
+          extBtn.classList.remove("hidden");
+          extBtn.onclick = () => {
+            const url = base64ToBlobUrl(record.external_pdf_base64);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `Resultats_Externes_${record.order_number}.pdf`;
+            a.click();
+          };
+        } else {
+          extBtn.classList.add("hidden");
+        }
+
+        resultBox.classList.remove("hidden");
+      } catch (err) {
+        loadingBox.classList.add("hidden");
+        showMessage("Erreur de connexion réseau : " + err.message, "err");
+      }
+    }
+
+    loginForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const orderNum = document.getElementById("orderNumber").value.trim();
+      const pin = document.getElementById("pinCode").value.trim();
+      fetchResult({ orderNumber: orderNum, pinCode: pin });
+    });
+
+    if (qrToken) {
+      loginForm.classList.add("hidden");
+      fetchResult({ token: qrToken });
+    }
+  </script>
+</body>
+</html>
