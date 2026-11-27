@@ -4,7 +4,8 @@
   "releaseDate": "2026-11-28",
   "title": "LaboPro LIS - Version 1.2.0",
   "changelog": [
-    "Résolution et optimisation de la connexion automate Mindray BC-30s "
+    "changements majeurs",
+    "ajouter beacoup de fonction "
     ],
   "downloadUrl": "https://github.com/packfear/laboratoire/releases/download/labo/laboratoire.exe",
   "isMandatory": false,
